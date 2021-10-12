@@ -64,13 +64,62 @@ const galleryItems = [
   },
 ];
 
-// const path = 'images/cat.webp';
+const lightboxContainer = document.getElementsByClassName('js-lightbox')[0];
+const lightBoxImage  = document.getElementsByClassName('lightbox__image')[0];
+const lightBoxOverlay = document.getElementsByClassName('lightbox__overlay')[0];
+const galleryContainer = document.getElementById('gallery');  
 
-// document.getElementById('gallery').innerHTML = "<img src='" + path + "' />";
-  
+function closeLightBox() {
+  lightBoxImage.setAttribute('src', null);
+  lightboxContainer.classList.remove('is-open');
+}
 
+function handleImageClick(event) {
+  const galleryImage = event.target.closest('.gallery__image')
+  if (galleryImage) { 
+    event.preventDefault(); 
+    const dataSource = galleryImage.getAttribute('data-source');
 
-
-  for (let i = 0; i < galleryItems.length; i++) {
-    document.getElementById('gallery').innerHTML += "<li class='gallery__item'><img class='gallery__image' src='" + galleryItems[i].preview + "' /></li>"
+    lightBoxImage.setAttribute('src', dataSource);
+    lightboxContainer.classList.add('is-open');
   }
+}
+
+function handleLightBoxClose(event) {
+  const closeTrigger = event.target.closest('.lightbox__button') || event.target.closest('.lightbox__overlay');
+  if (closeTrigger) {
+    event.preventDefault();
+    closeLightBox();
+  }
+}
+
+function handleKeyUp(event) {
+  if (event.keyCode === 27) {
+    // Esc key
+    return closeLightBox();
+  }
+
+  if ([39, 37].includes(event.keyCode)) {
+    const currentSrc = lightBoxImage.getAttribute('src');
+    if (currentSrc) {
+      const currentIndex = galleryItems.findIndex((item) => item.original === currentSrc);
+      let nextIndex = null;
+      if (currentIndex !== -1) {
+        // Right key
+        if (event.keyCode === 39) nextIndex = currentIndex < galleryItems.length - 1 ? currentIndex + 1 : 0;
+        // Left key
+        if (event.keyCode === 37) nextIndex = currentIndex > 0 ? currentIndex - 1 : galleryItems.length - 1;
+        
+        if (nextIndex !== null) return lightBoxImage.setAttribute('src', galleryItems[nextIndex].original);  
+      }
+    }
+  }
+}
+
+for (let i = 0; i < galleryItems.length; i++) {
+  document.getElementById('gallery').innerHTML += "<li class='gallery__item'><a class='gallery__link' href='" + galleryItems[i].original + "'><img class='gallery__image' src='" + galleryItems[i].preview + "' data-source='" + galleryItems[i].original + "' alt='" + galleryItems[i].description + "' /></a></li>"
+}
+
+galleryContainer.addEventListener("click", handleImageClick);
+document.addEventListener("click", handleLightBoxClose);
+document.addEventListener('keyup', handleKeyUp)
