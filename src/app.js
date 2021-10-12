@@ -63,3 +63,14 @@ const galleryItems = [
     description: 'Lighthouse Coast Sea',
   },
 ];
+
+// const path = 'images/cat.webp';
+
+// document.getElementById('gallery').innerHTML = "<img src='" + path + "' />";
+  
+
+
+
+  for (let i = 0; i < galleryItems.length; i++) {
+    document.getElementById('gallery').innerHTML += "<li class='gallery__item'><img class='gallery__image' src='" + galleryItems[i].preview + "' /></li>"
+  }
